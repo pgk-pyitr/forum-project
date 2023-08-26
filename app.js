@@ -1,5 +1,15 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('forum.db');
+const express = require('express');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+
+
+
+const app = express();
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
 
 db.serialize(() => {
   db.run(`
@@ -33,46 +43,49 @@ db.serialize(() => {
   `);
 });
 
-const express = require('express');
-const mysql = require('mysql');
-const bodyParser = require('body-parser');
-
-const app = express();
-app.use(bodyParser.json());
-
-
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'yourpassword',
-    database: 'forum'
-});
-
-db.connect((err) => {
-    if (err) throw err;
-    console.log('Connected to the database');
-});
-
 app.post('/register', (req, res) => {
-    const { username, password, email } = req.body;
-    const query = 'INSERT INTO users (username, password, email) VALUES (?, ?, ?)';
+  const { username, password, email } = req.body;
+
+  bcrypt.hash(password, 10, (err, hash) => {
+    if (err) throw err;
     
-    db.query(query, [username, password, email], (err, result) => {
-        if (err) throw err;
-        res.send({ success: true, message: 'User registered successfully' });
+    const query = 'INSERT INTO users (username, password, email) VALUES (?, ?, ?)';
+    db.run(query, [username, hash, email], (err) => {
+      if (err) throw err;
+      res.send({ success: true, message: 'User registered successfully' });
     });
+  });
 });
 
 app.post('/login', (req, res) => {
-    // Your login logic here
+  const { username, password } = req.body;
+  const query = 'SELECT * FROM users WHERE username = ?';
+
+  db.get(query, [username], (err, row) => {
+    if (err) {
+      throw err;
+    }
+
+    if (row) {
+      bcrypt.compare(password, row.password, (err, result) => {
+        if (result) {
+          res.send({ success: true, message: 'Login successful', user: { id: row.id, username: row.username } });
+        } else {
+          res.status(401).send({ success: false, message: 'Invalid password' });
+        }
+      });
+    } else {
+      res.status(404).send({ success: false, message: 'User not found' });
+    }
+  });
 });
 
 app.get('/questions', (req, res) => {
     const query = 'SELECT * FROM questions';
     
-    db.query(query, (err, result) => {
-        if (err) throw err;
-        res.send(result);
+    db.all(query, [], (err, rows) => {
+      if (err) throw err;
+      res.send(rows);
     });
 });
 
