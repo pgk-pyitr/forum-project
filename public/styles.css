@@ -1,0 +1,54 @@
+
+body {
+    background-color: white;
+    color: black;
+    font-family: Arial, sans-serif;
+}
+
+h1, h2 {
+    color: yellow;
+    background-color: black;
+    padding: 10px;
+}
+
+form {
+    background-color: black;
+    padding: 20px;
+    margin-top: 20px;
+    color: white;
+    border: 2px solid yellow;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: darkred;
+}
+
+#questionsList {
+    margin-top: 40px;
+}
+
+#questionsList div {
+    background-color: yellow;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid black;
+}
