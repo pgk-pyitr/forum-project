@@ -9,8 +9,13 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password, email })
-        }).then(response => response.json()).then(data => {
+        })
+        .then(response => response.json())
+        .then(data => {
             alert(data.message);
+        })
+        .catch(err => {
+            alert('Registration failed. Please try again.');
         });
     });
 
@@ -22,12 +27,18 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
-        }).then(response => response.json()).then(data => {
+        })
+        .then(response => response.json())
+        .then(data => {
             if (data.success) {
+                localStorage.setItem('user', JSON.stringify(data.user));
                 alert('Logged in successfully');
             } else {
-                alert('Login failed');
+                alert(data.message);
             }
+        })
+        .catch(err => {
+            alert('Login failed. Please try again.');
         });
     });
 
@@ -40,6 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
             div.textContent = `${question.title} - ${question.body}`;
             questionsList.appendChild(div);
         });
+    })
+    .catch(err => {
+        alert('Failed to load questions. Please try again.');
     });
 
 });
+
